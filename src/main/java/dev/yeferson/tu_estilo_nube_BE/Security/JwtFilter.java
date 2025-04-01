@@ -1,6 +1,5 @@
-package dev.yeferson.tu_estilo_nube_BE.Security;
+package dev.yeferson.tu_estilo_nube_BE.security;
 
-import dev.yeferson.tu_estilo_nube_BE.User.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import dev.yeferson.tu_estilo_nube_BE.user.UserService;
+
 import java.io.IOException;
 
 
@@ -32,14 +34,14 @@ String token = null;
 String username = null;
 
 if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-    token = authorizationHeader.substring(7); // Quita "Bearer " del header
+    token = authorizationHeader.substring(7); 
     username = jwtUtil.getUsernameFromToken(token);
 }
 
 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
     UserDetails userDetails = userService.loadUserByUsername(username);
     
-    // Cambio: Añadir userDetails como parámetro para validar el token
+ 
     if (jwtUtil.validateToken(token)) {
         UsernamePasswordAuthenticationToken authToken = 
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -48,7 +50,7 @@ if (username != null && SecurityContextHolder.getContext().getAuthentication() =
     }
 }
 
-filterChain.doFilter(request, response); // Continúa con la cadena de filtros
+filterChain.doFilter(request, response); 
 }
     
     

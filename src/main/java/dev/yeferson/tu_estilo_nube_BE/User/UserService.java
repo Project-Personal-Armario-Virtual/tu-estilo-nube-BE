@@ -1,4 +1,4 @@
-package dev.yeferson.tu_estilo_nube_BE.User;
+package dev.yeferson.tu_estilo_nube_BE.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
