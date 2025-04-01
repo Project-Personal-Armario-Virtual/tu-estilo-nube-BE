@@ -1,4 +1,4 @@
-package dev.yeferson.tu_estilo_nube_BE.User;
+package dev.yeferson.tu_estilo_nube_BE.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

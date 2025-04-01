@@ -1,4 +1,4 @@
-package dev.yeferson.tu_estilo_nube_BE.Security;
+package dev.yeferson.tu_estilo_nube_BE.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
