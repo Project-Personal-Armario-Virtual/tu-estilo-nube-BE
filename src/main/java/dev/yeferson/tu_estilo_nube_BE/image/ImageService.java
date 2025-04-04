@@ -1,5 +1,7 @@
 package dev.yeferson.tu_estilo_nube_BE.image;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,10 @@ public class ImageService {
         image.setData(data);
         image.setUser(user);
         return imageRepository.save(image);
+    }
+
+    public List<Image> findByUser(User user) {
+        return imageRepository.findByUser(user);
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.List;
 
 import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
@@ -38,7 +39,6 @@ public class ImageController {
             String username = authentication.getName();
             System.out.println("Usuario autenticado: " + username);
 
-            // Usar un método que devuelva la entidad User directamente
             User user = userService.findByUsername(username);
             if (user == null) {
                 return ResponseEntity.status(404).body("User not found");
@@ -56,4 +56,13 @@ public class ImageController {
         }
 
     }
+
+    @GetMapping("/list")
+public ResponseEntity<List<Image>> listImages(Authentication authentication) {
+    String username = authentication.getName();
+    User user = userService.findByUsername(username);
+    List<Image> images = imageService.findByUser(user);
+    return ResponseEntity.ok(images);
+}
+
 }
