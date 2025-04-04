@@ -1,18 +1,16 @@
 package dev.yeferson.tu_estilo_nube_BE.image;
 
+import dev.yeferson.tu_estilo_nube_BE.user.User;
+import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.List;
-
-import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
-import dev.yeferson.tu_estilo_nube_BE.user.User;
-import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 
 @RestController
 @RequestMapping("/api/images")
@@ -23,9 +21,6 @@ public class ImageController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, Authentication authentication) {
@@ -39,7 +34,6 @@ public class ImageController {
 
             String username = authentication.getName();
             System.out.println("Usuario autenticado: " + username);
-
             User user = userService.findByUsername(username);
             if (user == null) {
                 return ResponseEntity.status(404).body("User not found");
@@ -55,24 +49,23 @@ public class ImageController {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Unexpected error: " + e.getMessage());
         }
-
     }
 
     @GetMapping("/list")
-public ResponseEntity<List<Image>> listImages(Authentication authentication) {
-    String username = authentication.getName();
-    User user = userService.findByUsername(username);
-    List<Image> images = imageService.findByUser(user);
-    return ResponseEntity.ok(images);
-}
+    public ResponseEntity<List<ImageDTO>> listImages(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        List<ImageDTO> images = imageService.findByUser(user);
+        return ResponseEntity.ok(images);
+    }
 
-    @GetMapping("/image/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
         Image image = imageService.findById(id)
-        .orElseThrow(() -> new RuntimeException("Image not found"));
-    return ResponseEntity.ok()
-        .header("Content-Disposition", "attachment; filename=" + image.getFileName())
-        .contentType(MediaType.IMAGE_JPEG) 
-        .body(image.getData());
+            .orElseThrow(() -> new RuntimeException("Image not found"));
+        return ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=" + image.getFileName())
+            .contentType(MediaType.IMAGE_JPEG)
+            .body(image.getData());
     }
 }
