@@ -28,15 +28,32 @@ public class ImageController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, Authentication authentication) {
         try {
-            String username = authentication.getName(); // Obtiene el usuario del token JWT
-            User user = (User) userService.loadUserByUsername(username);
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("No file provided");
+            }
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("User not authenticated");
+            }
+
+            String username = authentication.getName();
+            System.out.println("Usuario autenticado: " + username);
+
+            // Usar un método que devuelva la entidad User directamente
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(404).body("User not found");
+            }
+
+            System.out.println("Guardando imagen: " + file.getOriginalFilename());
             imageService.saveImage(file.getOriginalFilename(), file.getBytes(), user);
             return ResponseEntity.ok("Image uploaded successfully");
         } catch (IOException e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Failed to upload image: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Unexpected error: " + e.getMessage());
         }
+
     }
-
-
-
 }
