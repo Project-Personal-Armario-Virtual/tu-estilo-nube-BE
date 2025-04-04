@@ -2,6 +2,7 @@ package dev.yeferson.tu_estilo_nube_BE.image;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -65,4 +66,13 @@ public ResponseEntity<List<Image>> listImages(Authentication authentication) {
     return ResponseEntity.ok(images);
 }
 
+    @GetMapping("/image/{id}")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
+        Image image = imageService.findById(id)
+        .orElseThrow(() -> new RuntimeException("Image not found"));
+    return ResponseEntity.ok()
+        .header("Content-Disposition", "attachment; filename=" + image.getFileName())
+        .contentType(MediaType.IMAGE_JPEG) 
+        .body(image.getData());
+    }
 }
