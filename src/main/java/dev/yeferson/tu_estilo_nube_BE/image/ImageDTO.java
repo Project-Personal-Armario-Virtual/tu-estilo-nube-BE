@@ -15,7 +15,7 @@ public class ImageDTO {
         this.labels = labels;
     }
 
-
+   
 
     public Long getId() {
         return id;
