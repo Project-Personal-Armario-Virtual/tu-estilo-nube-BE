@@ -23,12 +23,10 @@ public class Image {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    
-    // Nueva propiedad para las etiquetas
+
     @ElementCollection
     private List<String> labels;
 
-    // Getters y setters
     public Long getId() {
         return id;
     }

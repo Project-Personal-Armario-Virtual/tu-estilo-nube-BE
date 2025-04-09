@@ -10,7 +10,7 @@ public class VisionConfig {
 
     @Bean
     public ImageAnnotatorClient imageAnnotatorClient() throws IOException {
-        // Esta llamada utiliza la variable GOOGLE_APPLICATION_CREDENTIALS para cargar las credenciales
+      
         return ImageAnnotatorClient.create();
     }
 }
