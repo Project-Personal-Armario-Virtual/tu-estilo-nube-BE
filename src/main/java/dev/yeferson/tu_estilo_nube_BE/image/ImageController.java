@@ -20,7 +20,6 @@ public class ImageController {
     private final UserService userService;
     private final VisionService visionService;
 
-    // Constructor injection; no explicit @Autowired needed if there's only one constructor.
     public ImageController(ImageService imageService, UserService userService, VisionService visionService) {
         this.imageService = imageService;
         this.userService = userService;
@@ -47,10 +46,10 @@ public class ImageController {
             System.out.println("Saving image: " + file.getOriginalFilename());
             byte[] imageData = file.getBytes();
 
-            // Call VisionService to analyze the image and extract labels
+          
             List<String> labels = visionService.analyzeImage(imageData);
 
-            // Save the image along with its labels in the database
+         
             imageService.saveImage(file.getOriginalFilename(), imageData, user, labels);
             return ResponseEntity.ok("Image uploaded and analyzed successfully");
         } catch (IOException e) {

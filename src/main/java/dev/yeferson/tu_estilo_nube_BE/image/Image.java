@@ -3,6 +3,8 @@ package dev.yeferson.tu_estilo_nube_BE.image;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "images")
 public class Image {
@@ -21,7 +23,12 @@ public class Image {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    
+    // Nueva propiedad para las etiquetas
+    @ElementCollection
+    private List<String> labels;
 
+    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -54,6 +61,11 @@ public class Image {
         this.user = user;
     }
 
-    
+    public List<String> getLabels() {
+        return labels;
+    }
 
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
+    }
 }
