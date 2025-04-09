@@ -11,6 +11,6 @@ import dev.yeferson.tu_estilo_nube_BE.user.User;
 public interface ImageRepository extends JpaRepository<Image, Long> {
     List<Image> findByUser(User user);
 
-    @Query("SELECT new dev.yeferson.tu_estilo_nube_BE.image.ImageDTO(i.id, i.fileName, i.user.id) FROM Image i WHERE i.user = :user")
+    @Query("SELECT new dev.yeferson.tu_estilo_nube_BE.image.ImageDTO(i.id, i.fileName, i.user.id, i.labels) FROM Image i WHERE i.user = :user")
     List<ImageDTO> findImageDTOsByUser(@Param("user") User user);
 }
