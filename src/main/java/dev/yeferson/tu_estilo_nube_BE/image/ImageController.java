@@ -2,7 +2,7 @@ package dev.yeferson.tu_estilo_nube_BE.image;
 
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.yeferson.tu_estilo_nube_BE.vision.VisionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,11 +16,15 @@ import java.util.List;
 @RequestMapping("/api/images")
 public class ImageController {
 
-    @Autowired
-    private ImageService imageService;
+    private final ImageService imageService;
+    private final UserService userService;
+    private final VisionService visionService;
 
-    @Autowired
-    private UserService userService;
+    public ImageController(ImageService imageService, UserService userService, VisionService visionService) {
+        this.imageService = imageService;
+        this.userService = userService;
+        this.visionService = visionService;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, Authentication authentication) {
@@ -33,15 +37,21 @@ public class ImageController {
             }
 
             String username = authentication.getName();
-            System.out.println("Usuario autenticado: " + username);
+            System.out.println("Authenticated user: " + username);
             User user = userService.findByUsername(username);
             if (user == null) {
                 return ResponseEntity.status(404).body("User not found");
             }
 
-            System.out.println("Guardando imagen: " + file.getOriginalFilename());
-            imageService.saveImage(file.getOriginalFilename(), file.getBytes(), user);
-            return ResponseEntity.ok("Image uploaded successfully");
+            System.out.println("Saving image: " + file.getOriginalFilename());
+            byte[] imageData = file.getBytes();
+
+          
+            List<String> labels = visionService.analyzeImage(imageData);
+
+         
+            imageService.saveImage(file.getOriginalFilename(), imageData, user, labels);
+            return ResponseEntity.ok("Image uploaded and analyzed successfully");
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Failed to upload image: " + e.getMessage());
@@ -62,10 +72,10 @@ public class ImageController {
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
         Image image = imageService.findById(id)
-            .orElseThrow(() -> new RuntimeException("Image not found"));
+                .orElseThrow(() -> new RuntimeException("Image not found"));
         return ResponseEntity.ok()
-            .header("Content-Disposition", "attachment; filename=" + image.getFileName())
-            .contentType(MediaType.IMAGE_JPEG)
-            .body(image.getData());
+                .header("Content-Disposition", "attachment; filename=" + image.getFileName())
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(image.getData());
     }
 }

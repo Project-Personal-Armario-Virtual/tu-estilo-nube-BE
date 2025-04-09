@@ -1,17 +1,21 @@
 package dev.yeferson.tu_estilo_nube_BE.image;
 
+import java.util.List;
+
 public class ImageDTO {
     private Long id;
     private String fileName;
     private Long userId;
+    private List<String> labels;  
 
-
-    public ImageDTO(Long id, String fileName, Long userId) {
+    public ImageDTO(Long id, String fileName, Long userId, List<String> labels) {
         this.id = id;
         this.fileName = fileName;
         this.userId = userId;
+        this.labels = labels;
     }
 
+   
 
     public Long getId() {
         return id;
@@ -35,5 +39,13 @@ public class ImageDTO {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public List<String> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
     }
 }
