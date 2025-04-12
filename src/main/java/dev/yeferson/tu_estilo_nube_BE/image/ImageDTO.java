@@ -6,16 +6,18 @@ public class ImageDTO {
     private Long id;
     private String fileName;
     private Long userId;
-    private List<String> labels;  
+    private List<String> labels;
+    private String categoryName; 
 
-    public ImageDTO(Long id, String fileName, Long userId, List<String> labels) {
+    public ImageDTO(Long id, String fileName, Long userId, List<String> labels, String categoryName) {
         this.id = id;
         this.fileName = fileName;
         this.userId = userId;
         this.labels = labels;
+        this.categoryName = categoryName;
     }
 
-   
+
 
     public Long getId() {
         return id;
@@ -47,5 +49,13 @@ public class ImageDTO {
 
     public void setLabels(List<String> labels) {
         this.labels = labels;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }
