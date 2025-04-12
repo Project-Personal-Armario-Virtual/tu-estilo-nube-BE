@@ -1,6 +1,7 @@
 package dev.yeferson.tu_estilo_nube_BE.image;
 
 import dev.yeferson.tu_estilo_nube_BE.user.User;
+import dev.yeferson.tu_estilo_nube_BE.category.Category;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -23,6 +24,10 @@ public class Image {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @ElementCollection
     private List<String> labels;
