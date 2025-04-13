@@ -47,4 +47,18 @@ public class ImageService {
     public Optional<Image> findById(Long id) {
         return imageRepository.findById(id);
     }
+
+    public void deleteImage(Long id, User user) {
+        Optional<Image> imageOpt = imageRepository.findById(id);
+        if (imageOpt.isPresent()) {
+            Image image = imageOpt.get();
+            if (image.getUser().getId().equals(user.getId())) {
+                imageRepository.delete(image);
+            } else {
+                throw new RuntimeException("Not authorized to delete this image");
+            }
+        } else {
+            throw new RuntimeException("Image not found");
+        }
+}
 }
