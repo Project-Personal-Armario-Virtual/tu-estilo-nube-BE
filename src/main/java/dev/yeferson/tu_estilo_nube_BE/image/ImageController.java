@@ -73,7 +73,7 @@ public class ImageController {
         }
     }
 
-    // Nuevo endpoint para listar imágenes de un usuario
+
     @GetMapping("/list")
     public ResponseEntity<List<ImageDTO>> listImages(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -88,7 +88,7 @@ public class ImageController {
         return ResponseEntity.ok(images);
     }
 
-    // Endpoint para obtener una imagen por su ID, para su descarga o visualización
+    
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
         return imageService.findById(id)
@@ -104,5 +104,24 @@ public class ImageController {
                             .body(img.getData());
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteImage(@PathVariable Long id, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+        try {
+            imageService.deleteImage(id, user);
+            return ResponseEntity.ok("Image deleted successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error deleting image: " + e.getMessage());
+        }
     }
 }
