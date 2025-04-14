@@ -8,16 +8,16 @@ public class ImageDTO {
     private Long userId;
     private List<String> labels;
     private String categoryName; 
+    private String dominantColor; 
 
-    public ImageDTO(Long id, String fileName, Long userId, List<String> labels, String categoryName) {
+    public ImageDTO(Long id, String fileName, Long userId, List<String> labels, String categoryName, String dominantColor) {
         this.id = id;
         this.fileName = fileName;
         this.userId = userId;
         this.labels = labels;
         this.categoryName = categoryName;
+        this.dominantColor = dominantColor;
     }
-
-
 
     public Long getId() {
         return id;
@@ -57,5 +57,13 @@ public class ImageDTO {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public String getDominantColor() {
+        return dominantColor;
+    }
+
+    public void setDominantColor(String dominantColor) {
+        this.dominantColor = dominantColor;
     }
 }

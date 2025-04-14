@@ -52,7 +52,9 @@ public class ImageController {
             }
 
             byte[] imageData = file.getBytes();
-            List<String> labels = visionService.analyzeImage(imageData);
+            VisionService.ProcessedImageData processedData = visionService.analyzeImage(imageData);
+            List<String> labels = processedData.getLabels();
+            
 
             Category category = null;
             if (categoryId != null) {
