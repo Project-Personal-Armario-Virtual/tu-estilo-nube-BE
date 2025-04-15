@@ -4,18 +4,16 @@ import dev.yeferson.tu_estilo_nube_BE.vision.VisionService.ProcessedImageData;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PantsStyleRule implements CategoryRule {
-
+public class UnderwearCategoryRule implements CategoryRule {
     @Override
     public String apply(ProcessedImageData data) {
         List<String> lowerLabels = data.getLabels().stream()
                                        .map(String::toLowerCase)
                                        .collect(Collectors.toList());
-        if (lowerLabels.contains("jeans") || lowerLabels.contains("denim")) {
-            return "Casual Pants";
-        }
-        if (lowerLabels.contains("dress pants") || lowerLabels.contains("trousers")) {
-            return "Formal Pants";
+        if (lowerLabels.contains("bra") || lowerLabels.contains("lingerie")
+                || lowerLabels.contains("undergarment") || lowerLabels.contains("sports bra")) {
+         
+            return "Underwear / Sports Bras";
         }
         return null;
     }

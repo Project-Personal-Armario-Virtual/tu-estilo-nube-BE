@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class CategoryDictionaryLoader {
 
-    private static final String DICTIONARY_PATH = "/config/category-dictionary.json";
+    private static final String DICTIONARY_PATH = "/category-dictionary.json";
 
     public static Map<String, CategoryDefinition> loadDictionary() {
         ObjectMapper mapper = new ObjectMapper();

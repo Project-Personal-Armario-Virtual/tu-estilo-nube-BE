@@ -23,7 +23,7 @@ public class ImageService {
         image.setUser(user);
         image.setLabels(labels);
         image.setCategory(category);
-        image.setDominantColor(dominantColor);  // Se asigna el color dominante
+        image.setDominantColor(dominantColor);  
         return imageRepository.save(image);
     }
 
