@@ -10,7 +10,7 @@ import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.cloud.vision.v1.ImageProperties;
 import com.google.protobuf.ByteString;
-import com.google.type.Color; // Clase para el color devuelto
+import com.google.type.Color;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,9 +41,6 @@ public class VisionService {
             List<String> labels = new ArrayList<>();
             String dominantColor = null;
             float maxFraction = 0.0f;
-            // Candidato alternativo: color no blanco con mayor fracción que supere un umbral
-            String candidateColor = null;
-            float candidateFraction = 0.0f;
 
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
@@ -53,7 +50,7 @@ public class VisionService {
                 // Extraer etiquetas
                 res.getLabelAnnotationsList().forEach(annotation -> labels.add(annotation.getDescription()));
 
-                // Extraer propiedades de imagen para obtener datos de color
+                // Extraer propiedades de imagen para obtener los datos de color
                 ImageProperties properties = res.getImagePropertiesAnnotation();
                 if (properties != null && properties.getDominantColors() != null) {
                     List<ColorInfo> colors = properties.getDominantColors().getColorsList();
@@ -66,20 +63,23 @@ public class VisionService {
                         float pixelFraction = colorInfo.getPixelFraction();
                         System.out.printf("RGB(%.2f, %.2f, %.2f), Fraction: %.2f%n", r, g, b, pixelFraction);
                         
+                        // Filtrar colores casi blancos para ignorarlos
+                        if (r > 240 && g > 240 && b > 240) {
+                            System.out.println("Ignoring nearly white color");
+                            continue;
+                        }
+                        
                         String currentColor = mapRgbToColorName(c);
                         if (pixelFraction > maxFraction) {
                             maxFraction = pixelFraction;
                             dominantColor = currentColor;
                         }
-                        // Guardamos un candidato no blanco, si lo hay, y con mayor fracción
-                        if (!"White".equals(currentColor) && pixelFraction > candidateFraction) {
-                            candidateFraction = pixelFraction;
-                            candidateColor = currentColor;
-                        }
                     }
-                    // Si el color dominante es "White" pero hay un candidato con suficiente fracción (por ejemplo, > 0.30)
-                    if ("White".equals(dominantColor) && candidateColor != null && candidateFraction > 0.30f) {
-                        dominantColor = candidateColor;
+                    // Fallback: si se filtró todo y no se asignó color, se usa el primer color disponible
+                    if (dominantColor == null && !colors.isEmpty()) {
+                        Color firstColor = colors.get(0).getColor();
+                        dominantColor = mapRgbToColorName(firstColor);
+                        maxFraction = colors.get(0).getPixelFraction();
                     }
                     System.out.println("Dominant Color Selected: " + dominantColor + " (Fraction: " + maxFraction + ")");
                 }
@@ -90,7 +90,7 @@ public class VisionService {
     
     /**
      * Función helper que mapea los valores RGB a un nombre de color.
-     * Se ha ajustado para que, por ejemplo, para (29, 29, 31) retorne "Black".
+     * Se ha ajustado para que, por ejemplo, para (29,29,31) retorne "Black".
      */
     public static String mapRgbToColorName(Color color) {
         float red = color.getRed();
