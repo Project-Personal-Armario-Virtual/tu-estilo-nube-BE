@@ -25,6 +25,7 @@ public class PantsCategoryRule implements CategoryRule {
         for (String label : lowerLabels) {
             for (String keyword : pantsKeywords) {
                 if (label.contains(keyword)) {
+                   
                     if ("black".equalsIgnoreCase(data.getDominantColor())) {
                         return "Black Pants";
                     }

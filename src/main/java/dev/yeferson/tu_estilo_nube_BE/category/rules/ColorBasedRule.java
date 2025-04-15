@@ -13,9 +13,11 @@ public class ColorBasedRule implements CategoryRule {
             List<String> lowerLabels = data.getLabels().stream()
                                            .map(String::toLowerCase)
                                            .collect(Collectors.toList());
+        
             if (lowerLabels.contains("shirt") || lowerLabels.contains("top") || lowerLabels.contains("blouse")) {
                 return "Upper Wear - Black";
             }
+          
             if (lowerLabels.contains("pants") || lowerLabels.contains("jeans")) {
                 return "Pants - Black";
             }

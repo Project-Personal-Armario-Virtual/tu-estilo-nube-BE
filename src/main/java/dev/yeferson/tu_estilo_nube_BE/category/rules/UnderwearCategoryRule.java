@@ -10,9 +10,9 @@ public class UnderwearCategoryRule implements CategoryRule {
         List<String> lowerLabels = data.getLabels().stream()
                                        .map(String::toLowerCase)
                                        .collect(Collectors.toList());
-        if (lowerLabels.contains("bra") || lowerLabels.contains("lingerie")
-                || lowerLabels.contains("undergarment") || lowerLabels.contains("sports bra")) {
-         
+       
+        if (lowerLabels.contains("bra") || lowerLabels.contains("lingerie") ||
+            lowerLabels.contains("undergarment") || lowerLabels.contains("sports bra")) {
             return "Underwear / Sports Bras";
         }
         return null;

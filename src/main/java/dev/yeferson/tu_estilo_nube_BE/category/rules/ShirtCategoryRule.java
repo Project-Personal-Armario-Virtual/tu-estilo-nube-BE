@@ -22,14 +22,15 @@ public class ShirtCategoryRule implements CategoryRule {
         List<String> lowerLabels = data.getLabels().stream()
                                        .map(String::toLowerCase)
                                        .collect(Collectors.toList());
-        // Evitar que se aplique si ya se clasificó como underwear según otras reglas
-        if (lowerLabels.contains("bra") || lowerLabels.contains("lingerie") || lowerLabels.contains("undergarment")
-            || lowerLabels.contains("sports bra")) {
+        // Si se detectan términos de underwear, devolvemos null para que la regla UnderwearCategoryRule se encargue
+        if (lowerLabels.contains("bra") || lowerLabels.contains("lingerie") ||
+            lowerLabels.contains("undergarment") || lowerLabels.contains("sports bra")) {
             return null;
         }
         for (String label : lowerLabels) {
             for (String keyword : shirtKeywords) {
                 if (label.contains(keyword)) {
+                   
                     if (lowerLabels.contains("yellow")) {
                         return "Yellow Shirts";
                     }
