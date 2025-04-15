@@ -1,0 +1,36 @@
+{
+    "upper_wear": {
+      "base_category": "Prendas Superiores",
+      "keywords": [
+        "shirt", "blouse", "t-shirt", "top", "sleeve", "collar", "dress shirt",
+        "jersey", "sweater", "hoodie", "bomber", "polo", "camisa", "blusa", "suéter", "camiseta"
+      ]
+    },
+    "lower_wear": {
+      "base_category": "Prendas Inferiores",
+      "keywords": [
+        "pants", "jeans", "trousers", "shorts", "skirt", "leggings", "chinos", "slacks", "denim", "cargos", 
+        "pantalón", "falda", "shorts", "legging"
+      ]
+    },
+    "footwear": {
+      "base_category": "Calzado",
+      "keywords": [
+        "shoe", "shoes", "sneakers", "boot", "boots", "sandal", "flip-flop", "slipper", "footwear", 
+        "loafer", "trainer", "zapatilla", "botas", "sandalia"
+      ]
+    },
+    "underwear": {
+      "base_category": "Prendas Interiores/Accesorios",
+      "keywords": [
+        "bra", "lingerie", "undergarment", "briefs", "panties", "boxer", "underwear", "calzoncillo", "ropa interior", "socks", "hosiery"
+      ]
+    },
+    "outerwear": {
+      "base_category": "Outerwear",
+      "keywords": [
+        "coat", "jacket", "blazer", "parka", "overcoat", "windbreaker", "trench", "anorak", "cardigan", "mantle", "raincoat", "abrigo", "chaqueta", "cazadora"
+      ]
+    }
+  }
+  
