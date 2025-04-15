@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,6 @@ public class ImageController {
     private final VisionService visionService;
     private final CategoryService categoryService;
 
-    // Constructor sin @Autowired (inyección por constructor)
     public ImageController(ImageService imageService, UserService userService, VisionService visionService, CategoryService categoryService) {
         this.imageService = imageService;
         this.userService = userService;
@@ -52,7 +50,10 @@ public class ImageController {
             }
 
             byte[] imageData = file.getBytes();
-            List<String> labels = visionService.analyzeImage(imageData);
+            // Obtener el objeto que contiene etiquetas y dominantColor
+            VisionService.ProcessedImageData processedData = visionService.analyzeImage(imageData);
+            List<String> labels = processedData.getLabels();
+            String dominantColor = processedData.getDominantColor();
 
             Category category = null;
             if (categoryId != null) {
@@ -62,7 +63,8 @@ public class ImageController {
                 }
             }
 
-            imageService.saveImage(file.getOriginalFilename(), imageData, user, labels, category);
+            // Se pasa el dominantColor obtenido
+            imageService.saveImage(file.getOriginalFilename(), imageData, user, labels, category, dominantColor);
             return ResponseEntity.ok("Image uploaded and analyzed successfully");
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,7 +74,6 @@ public class ImageController {
             return ResponseEntity.status(500).body("Unexpected error: " + e.getMessage());
         }
     }
-
 
     @GetMapping("/list")
     public ResponseEntity<List<ImageDTO>> listImages(Authentication authentication) {
@@ -88,13 +89,11 @@ public class ImageController {
         return ResponseEntity.ok(images);
     }
 
-    
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
         return imageService.findById(id)
                 .map(img -> {
-                    // Asigna el content-type dinámicamente según la extensión, si es necesario.
-                    String contentType = "image/jpeg"; // Valor por defecto
+                    String contentType = "image/jpeg";
                     if (img.getFileName() != null && img.getFileName().toLowerCase().endsWith(".png")) {
                         contentType = "image/png";
                     }

@@ -32,6 +32,9 @@ public class Image {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> labels;
 
+    @Column
+    private String dominantColor;
+
     public Long getId() {
         return id;
     }
@@ -78,5 +81,13 @@ public class Image {
 
     public void setLabels(List<String> labels) {
         this.labels = labels;
+    }
+
+    public String getDominantColor() {
+        return dominantColor;
+    }
+
+    public void setDominantColor(String dominantColor) {
+        this.dominantColor = dominantColor;
     }
 }

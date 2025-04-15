@@ -16,20 +16,19 @@ public class ImageService {
         this.imageRepository = imageRepository;
     }
 
-  
-    public Image saveImage(String fileName, byte[] data, User user, List<String> labels, Category category) {
+    public Image saveImage(String fileName, byte[] data, User user, List<String> labels, Category category, String dominantColor) {
         Image image = new Image();
         image.setFileName(fileName);
         image.setData(data);
         image.setUser(user);
         image.setLabels(labels);
         image.setCategory(category);
+        image.setDominantColor(dominantColor);  // Se asigna el color dominante
         return imageRepository.save(image);
     }
 
-
     public Image saveImage(String fileName, byte[] data, User user, List<String> labels) {
-        return saveImage(fileName, data, user, labels, null);
+        return saveImage(fileName, data, user, labels, null, null);
     }
 
     public List<ImageDTO> findByUser(User user) {
@@ -40,7 +39,8 @@ public class ImageService {
         List<Image> images = imageRepository.findByUser(user);
         return images.stream().map(i -> {
             String categoryName = (i.getCategory() != null) ? i.getCategory().getName() : null;
-            return new ImageDTO(i.getId(), i.getFileName(), i.getUser().getId(), i.getLabels(), categoryName);
+            String dominantColor = i.getDominantColor(); 
+            return new ImageDTO(i.getId(), i.getFileName(), i.getUser().getId(), i.getLabels(), categoryName, dominantColor);
         }).collect(Collectors.toList());
     }
 
@@ -60,5 +60,5 @@ public class ImageService {
         } else {
             throw new RuntimeException("Image not found");
         }
-}
+    }
 }
