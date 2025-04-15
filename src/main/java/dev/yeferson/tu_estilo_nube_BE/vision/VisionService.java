@@ -10,12 +10,12 @@ import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.cloud.vision.v1.ImageProperties;
 import com.google.protobuf.ByteString;
-import com.google.type.Color; // Importa la clase para el color de la respuesta
+import com.google.type.Color; // Clase para el color devuelto
+import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
 @Service
 public class VisionService {
 
@@ -53,12 +53,25 @@ public class VisionService {
                 // Extraer propiedades de imagen para obtener datos de color
                 ImageProperties properties = res.getImagePropertiesAnnotation();
                 if (properties != null && properties.getDominantColors() != null) {
-                    for (ColorInfo colorInfo : properties.getDominantColors().getColorsList()) {
-                        if (colorInfo.getPixelFraction() > maxFraction) {
-                            maxFraction = colorInfo.getPixelFraction();
-                            dominantColor = mapRgbToColorName(colorInfo.getColor());
+                    List<ColorInfo> colors = properties.getDominantColors().getColorsList();
+                    System.out.println("Detected Colors:");
+                    for (ColorInfo colorInfo : colors) {
+                        Color c = colorInfo.getColor();
+                        float r = c.getRed(), g = c.getGreen(), b = c.getBlue();
+                        float pixelFraction = colorInfo.getPixelFraction();
+                        System.out.printf("RGB(%.2f, %.2f, %.2f), Fraction: %.2f%n", r, g, b, pixelFraction);
+                        if (pixelFraction > maxFraction) {
+                            maxFraction = pixelFraction;
+                            dominantColor = mapRgbToColorName(c);
                         }
                     }
+                    // Si no se actualizó maxFraction pero hay colores, se puede usar el primero (fallback)
+                    if (maxFraction == 0.0f && !colors.isEmpty()) {
+                        Color firstColor = colors.get(0).getColor();
+                        dominantColor = mapRgbToColorName(firstColor);
+                        maxFraction = colors.get(0).getPixelFraction();
+                    }
+                    System.out.println("Dominant Color Selected: " + dominantColor + " (Fraction: " + maxFraction + ")");
                 }
             }
             return new ProcessedImageData(labels, dominantColor);
@@ -67,23 +80,26 @@ public class VisionService {
     
     /**
      * Función helper que mapea los valores RGB a un nombre de color.
-     * Este mapeo es simplificado y puede ajustarse según las necesidades.
+     * Se ha ajustado para que, por ejemplo, para (29,29,31) retorne "Black".
      */
     public static String mapRgbToColorName(Color color) {
         float red = color.getRed();
         float green = color.getGreen();
         float blue = color.getBlue();
         
-        // Ejemplo simple de mapeo
+        // Ajuste de umbrales:
         if (red > 240 && green > 240 && blue > 240) {
             return "White";
         } else if (red < 70 && green < 70 && blue < 70) {
             return "Black";
         } else if (red >= green && red >= blue) {
+            // Puedes definir reglas adicionales para tonos rojos
             return "Red";
         } else if (green >= red && green >= blue) {
+            // Regla para tonos verdes
             return "Green";
         } else if (blue >= red && blue >= green) {
+            // Regla para tonos azules
             return "Blue";
         }
         return "Unknown";
