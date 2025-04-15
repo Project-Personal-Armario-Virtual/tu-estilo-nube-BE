@@ -41,6 +41,9 @@ public class VisionService {
             List<String> labels = new ArrayList<>();
             String dominantColor = null;
             float maxFraction = 0.0f;
+            // Candidato alternativo: color no blanco con mayor fracción que supere un umbral
+            String candidateColor = null;
+            float candidateFraction = 0.0f;
 
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
@@ -57,19 +60,26 @@ public class VisionService {
                     System.out.println("Detected Colors:");
                     for (ColorInfo colorInfo : colors) {
                         Color c = colorInfo.getColor();
-                        float r = c.getRed(), g = c.getGreen(), b = c.getBlue();
+                        float r = c.getRed();
+                        float g = c.getGreen();
+                        float b = c.getBlue();
                         float pixelFraction = colorInfo.getPixelFraction();
                         System.out.printf("RGB(%.2f, %.2f, %.2f), Fraction: %.2f%n", r, g, b, pixelFraction);
+                        
+                        String currentColor = mapRgbToColorName(c);
                         if (pixelFraction > maxFraction) {
                             maxFraction = pixelFraction;
-                            dominantColor = mapRgbToColorName(c);
+                            dominantColor = currentColor;
+                        }
+                        // Guardamos un candidato no blanco, si lo hay, y con mayor fracción
+                        if (!"White".equals(currentColor) && pixelFraction > candidateFraction) {
+                            candidateFraction = pixelFraction;
+                            candidateColor = currentColor;
                         }
                     }
-                    // Si no se actualizó maxFraction pero hay colores, se puede usar el primero (fallback)
-                    if (maxFraction == 0.0f && !colors.isEmpty()) {
-                        Color firstColor = colors.get(0).getColor();
-                        dominantColor = mapRgbToColorName(firstColor);
-                        maxFraction = colors.get(0).getPixelFraction();
+                    // Si el color dominante es "White" pero hay un candidato con suficiente fracción (por ejemplo, > 0.30)
+                    if ("White".equals(dominantColor) && candidateColor != null && candidateFraction > 0.30f) {
+                        dominantColor = candidateColor;
                     }
                     System.out.println("Dominant Color Selected: " + dominantColor + " (Fraction: " + maxFraction + ")");
                 }
@@ -80,26 +90,22 @@ public class VisionService {
     
     /**
      * Función helper que mapea los valores RGB a un nombre de color.
-     * Se ha ajustado para que, por ejemplo, para (29,29,31) retorne "Black".
+     * Se ha ajustado para que, por ejemplo, para (29, 29, 31) retorne "Black".
      */
     public static String mapRgbToColorName(Color color) {
         float red = color.getRed();
         float green = color.getGreen();
         float blue = color.getBlue();
         
-        // Ajuste de umbrales:
         if (red > 240 && green > 240 && blue > 240) {
             return "White";
         } else if (red < 70 && green < 70 && blue < 70) {
             return "Black";
         } else if (red >= green && red >= blue) {
-            // Puedes definir reglas adicionales para tonos rojos
             return "Red";
         } else if (green >= red && green >= blue) {
-            // Regla para tonos verdes
             return "Green";
         } else if (blue >= red && blue >= green) {
-            // Regla para tonos azules
             return "Blue";
         }
         return "Unknown";
