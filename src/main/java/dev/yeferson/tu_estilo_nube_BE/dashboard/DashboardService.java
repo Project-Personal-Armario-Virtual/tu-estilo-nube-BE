@@ -1,5 +1,6 @@
 package dev.yeferson.tu_estilo_nube_BE.dashboard;
 
+import dev.yeferson.tu_estilo_nube_BE.category.CategoryCountDTO;
 import dev.yeferson.tu_estilo_nube_BE.image.Image;
 import dev.yeferson.tu_estilo_nube_BE.image.ImageRepository;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
@@ -42,5 +43,24 @@ public class DashboardService {
                 .orElse("N/A");
 
         return new DashboardStatsDTO(totalItems, totalCategories, mostCommonColor);
+    }
+
+    public List<CategoryCountDTO> getCategoryCounts(User user) {
+        return imageRepository.countImagesByCategory(user);
+    }
+
+    public List<CategorySummaryDTO> getCategorySummary(User user) {
+        List<Image> userImages = imageRepository.findByUser(user);
+        Map<String, Long> counts = new HashMap<>();
+
+        for (Image image : userImages) {
+            String category = image.getCategory() != null ? image.getCategory().getName() : "Uncategorized";
+            counts.put(category, counts.getOrDefault(category, 0L) + 1);
+        }
+
+        List<CategorySummaryDTO> summary = new ArrayList<>();
+        counts.forEach((name, count) -> summary.add(new CategorySummaryDTO(name, count)));
+
+        return summary;
     }
 }

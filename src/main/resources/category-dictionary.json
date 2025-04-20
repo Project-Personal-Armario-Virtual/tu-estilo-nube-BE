@@ -1,27 +1,27 @@
 {
     "upper_wear": {
-      "base_category": "Prendas Superiores",
+      "base_category": "Tops",
       "keywords": [
         "shirt", "blouse", "t-shirt", "top", "sleeve", "collar", "dress shirt",
         "jersey", "sweater", "hoodie", "bomber", "polo", "camisa", "blusa", "suéter", "camiseta"
       ]
     },
     "lower_wear": {
-      "base_category": "Prendas Inferiores",
+      "base_category": "Bottoms",
       "keywords": [
         "pants", "jeans", "trousers", "shorts", "skirt", "leggings", "chinos", "slacks", "denim", "cargos", 
         "pantalón", "falda", "shorts", "legging"
       ]
     },
     "footwear": {
-      "base_category": "Calzado",
+      "base_category": "Shoes",
       "keywords": [
         "shoe", "shoes", "sneakers", "boot", "boots", "sandal", "flip-flop", "slipper", "footwear", 
         "loafer", "trainer", "zapatilla", "botas", "sandalia"
       ]
     },
     "underwear": {
-      "base_category": "Prendas Interiores/Accesorios",
+      "base_category": "Accessories",
       "keywords": [
         "bra", "lingerie", "undergarment", "briefs", "panties", "boxer", "underwear", "calzoncillo", "ropa interior", "socks", "hosiery"
       ]

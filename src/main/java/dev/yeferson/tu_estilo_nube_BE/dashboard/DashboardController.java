@@ -1,10 +1,12 @@
 package dev.yeferson.tu_estilo_nube_BE.dashboard;
 
+import dev.yeferson.tu_estilo_nube_BE.category.CategoryCountDTO;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -32,5 +34,22 @@ public class DashboardController {
 
         DashboardStatsDTO stats = dashboardService.getDashboardStats(user);
         return ResponseEntity.ok(stats);
+    }
+
+ 
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategorySummaryDTO>> getCategorySummary(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        List<CategorySummaryDTO> summary = dashboardService.getCategorySummary(user);
+        return ResponseEntity.ok(summary);
     }
 }
