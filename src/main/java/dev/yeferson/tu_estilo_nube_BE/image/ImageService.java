@@ -23,7 +23,7 @@ public class ImageService {
         image.setUser(user);
         image.setLabels(labels);
         image.setCategory(category);
-        image.setDominantColor(dominantColor);  // Se asigna el color dominante
+        image.setDominantColor(dominantColor);  
         return imageRepository.save(image);
     }
 
@@ -60,5 +60,9 @@ public class ImageService {
         } else {
             throw new RuntimeException("Image not found");
         }
+    }
+
+    public List<Image> findRecentImagesByUser(User user) {
+        return imageRepository.findTop5ByUserOrderByCreatedAtDesc(user);
     }
 }
