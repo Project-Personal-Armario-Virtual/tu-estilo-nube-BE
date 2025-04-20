@@ -1,11 +1,11 @@
 package dev.yeferson.tu_estilo_nube_BE.image;
 
+import dev.yeferson.tu_estilo_nube_BE.category.Category;
+import dev.yeferson.tu_estilo_nube_BE.category.rules.CategoryMappingService;
+import dev.yeferson.tu_estilo_nube_BE.category.CategoryService;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import dev.yeferson.tu_estilo_nube_BE.vision.VisionService;
-import dev.yeferson.tu_estilo_nube_BE.category.Category;
-import dev.yeferson.tu_estilo_nube_BE.category.CategoryService;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -50,22 +50,37 @@ public class ImageController {
             }
 
             byte[] imageData = file.getBytes();
-            // Obtener el objeto que contiene etiquetas y dominantColor
+
+           
             VisionService.ProcessedImageData processedData = visionService.analyzeImage(imageData);
             List<String> labels = processedData.getLabels();
             String dominantColor = processedData.getDominantColor();
 
             Category category = null;
-            if (categoryId != null) {
+            
+            if (categoryId == null) {
+                CategoryMappingService mappingService = new CategoryMappingService();
+                String suggestedCategoryName = mappingService.suggestCategory(processedData);
+                Optional<Category> categoryOptional = categoryService.findByName(suggestedCategoryName);
+                if (categoryOptional.isPresent()) {
+                    category = categoryOptional.get();
+                } else {
+                    category = new Category();
+                    category.setName(suggestedCategoryName);
+                    category = categoryService.save(category);
+                }
+            } else {
                 Optional<Category> categoryOpt = categoryService.getCategoryById(categoryId);
                 if (categoryOpt.isPresent()) {
                     category = categoryOpt.get();
                 }
             }
 
-            // Se pasa el dominantColor obtenido
+            // Guardar la imagen con la información extraída y la categoría determinada
             imageService.saveImage(file.getOriginalFilename(), imageData, user, labels, category, dominantColor);
-            return ResponseEntity.ok("Image uploaded and analyzed successfully");
+            String responseMessage = "Image uploaded and analyzed successfully. Suggested category: " 
+                                     + (category != null ? category.getName() : "None");
+            return ResponseEntity.ok(responseMessage);
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Failed to upload image: " + e.getMessage());

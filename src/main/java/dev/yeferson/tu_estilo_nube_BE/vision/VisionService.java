@@ -24,11 +24,11 @@ public class VisionService {
             // Convertir la imagen a ByteString
             ByteString imgBytes = ByteString.copyFrom(imageData);
             Image img = Image.newBuilder().setContent(imgBytes).build();
-            
+
             // Configurar las features: etiquetas y propiedades de imagen
             Feature labelFeature = Feature.newBuilder().setType(Type.LABEL_DETECTION).build();
             Feature propertiesFeature = Feature.newBuilder().setType(Type.IMAGE_PROPERTIES).build();
-            
+
             AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
                     .addFeatures(labelFeature)
                     .addFeatures(propertiesFeature)
@@ -62,20 +62,20 @@ public class VisionService {
                         float b = c.getBlue();
                         float pixelFraction = colorInfo.getPixelFraction();
                         System.out.printf("RGB(%.2f, %.2f, %.2f), Fraction: %.2f%n", r, g, b, pixelFraction);
-                        
-                        // Filtrar colores casi blancos para ignorarlos
-                        if (r > 240 && g > 240 && b > 240) {
+
+                        // Filtrar colores casi blancos para ignorarlos (umbral ajustado a 220)
+                        if (r > 220 && g > 220 && b > 220) {
                             System.out.println("Ignoring nearly white color");
                             continue;
                         }
-                        
+
                         String currentColor = mapRgbToColorName(c);
                         if (pixelFraction > maxFraction) {
                             maxFraction = pixelFraction;
                             dominantColor = currentColor;
                         }
                     }
-                    // Fallback: si se filtró todo y no se asignó color, se usa el primer color disponible
+                    // Fallback: si no se asignó color, se usa el primer color disponible
                     if (dominantColor == null && !colors.isEmpty()) {
                         Color firstColor = colors.get(0).getColor();
                         dominantColor = mapRgbToColorName(firstColor);
@@ -87,17 +87,17 @@ public class VisionService {
             return new ProcessedImageData(labels, dominantColor);
         }
     }
-    
+
     /**
      * Función helper que mapea los valores RGB a un nombre de color.
-     * Se ha ajustado para que, por ejemplo, para (29,29,31) retorne "Black".
+     * Se ajustó el umbral para "White" a 220 para captar prendas blancas correctamente.
      */
     public static String mapRgbToColorName(Color color) {
         float red = color.getRed();
         float green = color.getGreen();
         float blue = color.getBlue();
-        
-        if (red > 240 && green > 240 && blue > 240) {
+
+        if (red > 220 && green > 220 && blue > 220) {
             return "White";
         } else if (red < 70 && green < 70 && blue < 70) {
             return "Black";
@@ -110,20 +110,20 @@ public class VisionService {
         }
         return "Unknown";
     }
-    
+
     public static class ProcessedImageData {
         private final List<String> labels;
         private final String dominantColor;
-        
+
         public ProcessedImageData(List<String> labels, String dominantColor) {
             this.labels = labels;
             this.dominantColor = dominantColor;
         }
-        
+
         public List<String> getLabels() {
             return labels;
         }
-        
+
         public String getDominantColor() {
             return dominantColor;
         }
