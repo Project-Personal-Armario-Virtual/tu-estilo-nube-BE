@@ -7,4 +7,6 @@ import dev.yeferson.tu_estilo_nube_BE.user.User;
 public interface ImageRepository extends JpaRepository<Image, Long> {
     
     List<Image> findByUser(User user);
+    List<Image> findTop5ByUserOrderByCreatedAtDesc(User user);
+
 }

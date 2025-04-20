@@ -61,4 +61,8 @@ public class ImageService {
             throw new RuntimeException("Image not found");
         }
     }
+
+    public List<Image> findRecentImagesByUser(User user) {
+        return imageRepository.findTop5ByUserOrderByCreatedAtDesc(user);
+    }
 }

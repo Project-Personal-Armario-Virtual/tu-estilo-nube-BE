@@ -123,4 +123,28 @@ public class ImageController {
             return ResponseEntity.status(500).body("Error deleting image: " + e.getMessage());
         }
     }
+
+    @GetMapping("/recent")
+public ResponseEntity<List<ImageDTO>> getRecentImages(Authentication authentication) {
+    if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(401).build();
+    }
+
+    String username = authentication.getName();
+    User user = userService.findByUsername(username);
+    if (user == null) {
+        return ResponseEntity.status(404).build();
+    }
+
+    List<Image> recentImages = imageService.findRecentImagesByUser(user);
+    List<ImageDTO> imageDTOs = recentImages.stream().map(i -> {
+        String categoryName = (i.getCategory() != null) ? i.getCategory().getName() : null;
+        return new ImageDTO(i.getId(), i.getFileName(), i.getUser().getId(), i.getLabels(), categoryName, i.getDominantColor());
+    }).toList();
+
+    return ResponseEntity.ok(imageDTOs);
+}
+
+
+    
 }
