@@ -1,8 +1,11 @@
 package dev.yeferson.tu_estilo_nube_BE.outfit;
 
+import dev.yeferson.tu_estilo_nube_BE.auth.dto.OutfitRequestDTO;
 import dev.yeferson.tu_estilo_nube_BE.outfit.dto.OutfitRecommendationDTO;
 import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,4 +27,14 @@ public class OutfitController {
         Long userId = jwtUtil.getUserIdFromRequest(request);
         return recommendationService.generateOutfits(userId);
     }
+
+    @PostMapping("/recommendations")
+public ResponseEntity<List<OutfitRecommendationDTO>> generateCustomRecommendations(
+        HttpServletRequest request,
+        @RequestBody OutfitRequestDTO outfitRequest) {
+
+    Long userId = jwtUtil.getUserIdFromRequest(request);
+    List<OutfitRecommendationDTO> outfits = recommendationService.generateOutfits(userId, outfitRequest);
+    return ResponseEntity.ok(outfits);
+}
 }

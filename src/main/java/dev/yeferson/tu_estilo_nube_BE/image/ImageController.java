@@ -120,6 +120,32 @@ public class ImageController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{id}/preview")
+public ResponseEntity<byte[]> previewImage(@PathVariable Long id, Authentication authentication) {
+    if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(401).build();
+    }
+
+    String username = authentication.getName();
+    User user = userService.findByUsername(username);
+    if (user == null) {
+        return ResponseEntity.status(404).build();
+    }
+
+    return imageService.findByIdAndUser(id, user)
+            .map(img -> {
+                String contentType = "image/jpeg";
+                String filename = img.getFileName() != null ? img.getFileName().toLowerCase() : "";
+                if (filename.endsWith(".png")) contentType = "image/png";
+                if (filename.endsWith(".webp")) contentType = "image/webp";
+
+                return ResponseEntity.ok()
+                        .header("Content-Type", contentType)
+                        .body(img.getData());
+            })
+            .orElseGet(() -> ResponseEntity.status(404).build());
+}
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteImage(@PathVariable Long id, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

@@ -65,4 +65,8 @@ public class ImageService {
     public List<Image> findRecentImagesByUser(User user) {
         return imageRepository.findTop5ByUserOrderByCreatedAtDesc(user);
     }
+
+    public Optional<Image> findByIdAndUser(Long id, User user) {
+        return imageRepository.findByIdAndUser(id, user);
+    }
 }

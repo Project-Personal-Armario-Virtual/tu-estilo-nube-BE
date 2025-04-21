@@ -1,5 +1,6 @@
 package dev.yeferson.tu_estilo_nube_BE.auth;
 
+import dev.yeferson.tu_estilo_nube_BE.auth.dto.LoginResponseDTO;
 import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
@@ -24,13 +25,13 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User loginRequest) {
+    public ResponseEntity<?> login(@RequestBody User loginRequest) {
         UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
 
         if (passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
             User user = userService.findByUsername(userDetails.getUsername());
             String token = jwtUtil.generateToken(user.getUsername(), user.getId());
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(new LoginResponseDTO(token, user));
         }
 
         return ResponseEntity.status(401).body("Invalid credentials");
