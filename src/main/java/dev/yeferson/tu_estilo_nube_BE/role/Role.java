@@ -1,10 +1,10 @@
-package dev.yeferson.tu_estilo_nube_BE.rol;
+package dev.yeferson.tu_estilo_nube_BE.role;
 
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "roles")
-public class Rol {
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -12,10 +12,10 @@ public class Rol {
     @Column(nullable = false, unique = true)
     private String name; 
 
-    public Rol() {
+    public Role() {
     }
 
-    public Rol(String name) {
+    public Role(String name) {
         this.name = name;
     }
 
