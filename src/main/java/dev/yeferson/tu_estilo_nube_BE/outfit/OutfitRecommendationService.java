@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 public class OutfitRecommendationService {
 
     private final ImageRepository imageRepository;
-    private final OutfitScoringService outfitScoringService;
+    private final OutfitScoringService scoringService;
 
-    public OutfitRecommendationService(ImageRepository imageRepository, OutfitScoringService outfitScoringService) {
+    public OutfitRecommendationService(ImageRepository imageRepository, OutfitScoringService scoringService) {
         this.imageRepository = imageRepository;
-        this.outfitScoringService = outfitScoringService;
+        this.scoringService = scoringService;
     }
 
     public List<OutfitRecommendationDTO> generateOutfits(Long userId, OutfitRequestDTO request) {
@@ -35,8 +35,8 @@ public class OutfitRecommendationService {
             return Collections.emptyList();
         }
 
+        Set<String> generatedKeys = new HashSet<>();
         List<OutfitRecommendationDTO> recommendations = new ArrayList<>();
-        Set<String> uniqueOutfits = new HashSet<>();
 
         for (ClothingItemDTO top : tops) {
             for (ClothingItemDTO bottom : bottoms) {
@@ -44,20 +44,19 @@ public class OutfitRecommendationService {
                     ClothingItemDTO accessory = accessories.isEmpty() ? null :
                             accessories.get(new Random().nextInt(accessories.size()));
 
-                    String comboKey = top.getId() + "-" + bottom.getId() + "-" + shoe.getId() +
-                            (accessory != null ? "-" + accessory.getId() : "");
+                    String key = top.getId() + "-" + bottom.getId() + "-" + shoe.getId() + "-" + (accessory != null ? accessory.getId() : "none");
 
-                    if (uniqueOutfits.contains(comboKey)) continue;
+                    if (!generatedKeys.contains(key)) {
+                        generatedKeys.add(key);
+                        double score = scoringService.calculateScore(top, bottom, shoe, accessory, request.getSeason(), request.getOccasion());
 
-                    uniqueOutfits.add(comboKey);
-
-                    double score = outfitScoringService.calculateScore(top, bottom, shoe, accessory);
-                    recommendations.add(new OutfitRecommendationDTO(
-                            top, bottom, shoe, accessory,
-                            request.getOccasion(),
-                            request.getSeason(),
-                            score
-                    ));
+                        recommendations.add(new OutfitRecommendationDTO(
+                                top, bottom, shoe, accessory,
+                                request.getOccasion(),
+                                request.getSeason(),
+                                score
+                        ));
+                    }
                 }
             }
         }
