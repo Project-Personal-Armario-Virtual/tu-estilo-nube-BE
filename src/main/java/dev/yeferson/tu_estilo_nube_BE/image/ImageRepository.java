@@ -14,6 +14,8 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
     List<Image> findTop5ByUserOrderByCreatedAtDesc(User user);
 
+    List<Image> findByUserIdAndCategory_NameIgnoreCase(Long userId, String categoryName);
+
   
     @Query("SELECT new dev.yeferson.tu_estilo_nube_BE.category.CategoryCountDTO(" +
        "COALESCE(i.category.name, 'Uncategorized'), COUNT(i)) " +
