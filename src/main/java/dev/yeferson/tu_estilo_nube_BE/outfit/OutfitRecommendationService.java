@@ -1,6 +1,7 @@
 package dev.yeferson.tu_estilo_nube_BE.outfit;
 
 import dev.yeferson.tu_estilo_nube_BE.auth.dto.OutfitRequestDTO;
+import dev.yeferson.tu_estilo_nube_BE.outfit.scoring.OutfitScoringService;
 import dev.yeferson.tu_estilo_nube_BE.category.rules.CategoryBaseMapper;
 import dev.yeferson.tu_estilo_nube_BE.image.Image;
 import dev.yeferson.tu_estilo_nube_BE.image.ImageRepository;
@@ -15,28 +16,48 @@ import java.util.stream.Collectors;
 public class OutfitRecommendationService {
 
     private final ImageRepository imageRepository;
+    private final OutfitScoringService outfitScoringService;
 
-    public OutfitRecommendationService(ImageRepository imageRepository) {
+    public OutfitRecommendationService(ImageRepository imageRepository, OutfitScoringService outfitScoringService) {
         this.imageRepository = imageRepository;
+        this.outfitScoringService = outfitScoringService;
     }
 
-    public List<OutfitRecommendationDTO> generateOutfits(Long userId) {
+    public List<OutfitRecommendationDTO> generateOutfits(Long userId, OutfitRequestDTO request) {
         List<ClothingItemDTO> tops = findByBaseCategory(userId, "Tops");
         List<ClothingItemDTO> bottoms = findByBaseCategory(userId, "Bottoms");
         List<ClothingItemDTO> shoes = findByBaseCategory(userId, "Shoes");
-        List<ClothingItemDTO> accessories = findByBaseCategory(userId, "Accessories");
+        List<ClothingItemDTO> accessories = request.isIncludeAccessories()
+                ? findByBaseCategory(userId, "Accessories")
+                : new ArrayList<>();
+
+        if (tops.isEmpty() || bottoms.isEmpty() || shoes.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         List<OutfitRecommendationDTO> recommendations = new ArrayList<>();
+        Set<String> uniqueOutfits = new HashSet<>();
 
         for (ClothingItemDTO top : tops) {
             for (ClothingItemDTO bottom : bottoms) {
                 for (ClothingItemDTO shoe : shoes) {
-                    ClothingItemDTO accessory = accessories.isEmpty() ? null : accessories.get(new Random().nextInt(accessories.size()));
+                    ClothingItemDTO accessory = accessories.isEmpty() ? null :
+                            accessories.get(new Random().nextInt(accessories.size()));
 
-                    double score = calculateScore(top, bottom, shoe, accessory);
+                    String comboKey = top.getId() + "-" + bottom.getId() + "-" + shoe.getId() +
+                            (accessory != null ? "-" + accessory.getId() : "");
+
+                    if (uniqueOutfits.contains(comboKey)) continue;
+
+                    uniqueOutfits.add(comboKey);
+
+                    double score = outfitScoringService.calculateScore(top, bottom, shoe, accessory);
                     recommendations.add(new OutfitRecommendationDTO(
                             top, bottom, shoe, accessory,
-                            "Casual", "Spring/Summer", score));
+                            request.getOccasion(),
+                            request.getSeason(),
+                            score
+                    ));
                 }
             }
         }
@@ -61,44 +82,4 @@ public class OutfitRecommendationService {
                         "/api/images/" + img.getId() + "/preview"))
                 .collect(Collectors.toList());
     }
-
-    private double calculateScore(ClothingItemDTO top, ClothingItemDTO bottom, ClothingItemDTO shoes, ClothingItemDTO accessory) {
-        // Future: implement logic based on color, season, occasion, etc.
-        return Math.random(); // Placeholder
-    }
-
-    public List<OutfitRecommendationDTO> generateOutfits(Long userId, OutfitRequestDTO request) {
-    List<ClothingItemDTO> tops = findByBaseCategory(userId, "Tops");
-    List<ClothingItemDTO> bottoms = findByBaseCategory(userId, "Bottoms");
-    List<ClothingItemDTO> shoes = findByBaseCategory(userId, "Shoes");
-    List<ClothingItemDTO> accessories = request.isIncludeAccessories()
-        ? findByBaseCategory(userId, "Accessories")
-        : new ArrayList<>();
-
-    if (tops.isEmpty() || bottoms.isEmpty() || shoes.isEmpty()) {
-        return Collections.emptyList();
-    }
-
-    List<OutfitRecommendationDTO> recommendations = new ArrayList<>();
-
-    for (ClothingItemDTO top : tops) {
-        for (ClothingItemDTO bottom : bottoms) {
-            for (ClothingItemDTO shoe : shoes) {
-                ClothingItemDTO accessory = accessories.isEmpty() ? null :
-                        accessories.get(new Random().nextInt(accessories.size()));
-
-                double score = calculateScore(top, bottom, shoe, accessory);
-                recommendations.add(new OutfitRecommendationDTO(
-                        top, bottom, shoe, accessory,
-                        request.getOccasion(),
-                        request.getSeason(),
-                        score
-                ));
-            }
-        }
-    }
-
-    recommendations.sort(Comparator.comparingDouble(OutfitRecommendationDTO::getScore).reversed());
-    return recommendations.size() > 10 ? recommendations.subList(0, 10) : recommendations;
-}
 }

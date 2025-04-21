@@ -22,11 +22,7 @@ public class OutfitController {
         this.jwtUtil = jwtUtil;
     }
 
-    @GetMapping("/recommendations")
-    public List<OutfitRecommendationDTO> getRecommendations(HttpServletRequest request) {
-        Long userId = jwtUtil.getUserIdFromRequest(request);
-        return recommendationService.generateOutfits(userId);
-    }
+
 
     @PostMapping("/recommendations")
 public ResponseEntity<List<OutfitRecommendationDTO>> generateCustomRecommendations(
