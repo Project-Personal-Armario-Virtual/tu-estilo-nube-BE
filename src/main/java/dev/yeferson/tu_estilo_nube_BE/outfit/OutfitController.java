@@ -1,7 +1,7 @@
 package dev.yeferson.tu_estilo_nube_BE.outfit;
 
-import dev.yeferson.tu_estilo_nube_BE.auth.dto.OutfitRequestDTO;
 import dev.yeferson.tu_estilo_nube_BE.outfit.dto.OutfitRecommendationDTO;
+import dev.yeferson.tu_estilo_nube_BE.outfit.dto.OutfitRequestDTO;
 import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 

@@ -7,6 +7,8 @@ import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import dev.yeferson.tu_estilo_nube_BE.role.Role;
 import dev.yeferson.tu_estilo_nube_BE.role.RoleRepository;
+import dev.yeferson.tu_estilo_nube_BE.profile.Profile;
+import dev.yeferson.tu_estilo_nube_BE.profile.ProfileRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,9 @@ public class AuthController {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private ProfileRepository profileRepository; 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User loginRequest) {
         UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
@@ -51,17 +56,23 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Username already exists");
         }
 
+      
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setEmail(request.getEmail());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 
-     
         Role userRole = roleRepository.findByName("ROLE_USER")
             .orElseThrow(() -> new RuntimeException("Default role not found"));
-
         newUser.setRoles(Collections.singleton(userRole));
-        userService.save(newUser);
+        User savedUser = userService.save(newUser);
+
+       
+        Profile profile = new Profile();
+        profile.setUser(savedUser);
+        profile.setDisplayName(savedUser.getUsername());
+        profile.setBio("");
+        profileRepository.save(profile);
 
         return ResponseEntity.ok("User registered successfully");
     }

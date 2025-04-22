@@ -1,12 +1,13 @@
 package dev.yeferson.tu_estilo_nube_BE.outfit;
 
-import dev.yeferson.tu_estilo_nube_BE.auth.dto.OutfitRequestDTO;
 import dev.yeferson.tu_estilo_nube_BE.outfit.scoring.OutfitScoringService;
 import dev.yeferson.tu_estilo_nube_BE.category.rules.CategoryBaseMapper;
 import dev.yeferson.tu_estilo_nube_BE.image.Image;
 import dev.yeferson.tu_estilo_nube_BE.image.ImageRepository;
 import dev.yeferson.tu_estilo_nube_BE.outfit.dto.ClothingItemDTO;
 import dev.yeferson.tu_estilo_nube_BE.outfit.dto.OutfitRecommendationDTO;
+import dev.yeferson.tu_estilo_nube_BE.outfit.dto.OutfitRequestDTO;
+
 import org.springframework.stereotype.Service;
 
 import java.util.*;

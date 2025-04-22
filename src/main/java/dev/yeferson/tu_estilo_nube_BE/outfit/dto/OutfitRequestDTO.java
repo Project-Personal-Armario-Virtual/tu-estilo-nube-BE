@@ -1,4 +1,4 @@
-package dev.yeferson.tu_estilo_nube_BE.auth.dto;
+package dev.yeferson.tu_estilo_nube_BE.outfit.dto;
 
 public class OutfitRequestDTO {
     private String occasion;
