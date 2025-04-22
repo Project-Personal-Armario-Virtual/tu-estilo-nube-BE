@@ -6,6 +6,8 @@ import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import dev.yeferson.tu_estilo_nube_BE.role.Role;
+import dev.yeferson.tu_estilo_nube_BE.role.RoleRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +28,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User loginRequest) {
@@ -51,12 +56,13 @@ public class AuthController {
         newUser.setEmail(request.getEmail());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        // Asignar rol USER por defecto
-        Role userRole = new Role();
-        userRole.setName("USER");
-        newUser.setRoles(Collections.singleton(userRole));
+     
+        Role userRole = roleRepository.findByName("ROLE_USER")
+            .orElseThrow(() -> new RuntimeException("Default role not found"));
 
+        newUser.setRoles(Collections.singleton(userRole));
         userService.save(newUser);
+
         return ResponseEntity.ok("User registered successfully");
     }
 }
