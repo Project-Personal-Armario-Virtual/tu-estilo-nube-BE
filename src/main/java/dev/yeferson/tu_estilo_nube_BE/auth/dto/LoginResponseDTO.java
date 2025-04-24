@@ -1,13 +1,12 @@
 package dev.yeferson.tu_estilo_nube_BE.auth.dto;
 
-import dev.yeferson.tu_estilo_nube_BE.user.User;
+import dev.yeferson.tu_estilo_nube_BE.user.dto.UserResponseDTO;
 
 public class LoginResponseDTO {
-
     private String token;
-    private User user;
+    private UserResponseDTO user;
 
-    public LoginResponseDTO(String token, User user) {
+    public LoginResponseDTO(String token, UserResponseDTO user) {
         this.token = token;
         this.user = user;
     }
@@ -16,7 +15,7 @@ public class LoginResponseDTO {
         return token;
     }
 
-    public User getUser() {
+    public UserResponseDTO getUser() {
         return user;
     }
 }
