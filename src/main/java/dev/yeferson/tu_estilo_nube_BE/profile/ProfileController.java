@@ -38,8 +38,7 @@ public class ProfileController {
         ProfileResponseDTO response = new ProfileResponseDTO(
                 profile.getId(),
                 profile.getDisplayName(),
-                profile.getBio()
-        );
+                profile.getBio());
 
         return ResponseEntity.ok(response);
     }
@@ -62,9 +61,15 @@ public class ProfileController {
         ProfileResponseDTO responseDTO = new ProfileResponseDTO(
                 updated.getId(),
                 updated.getDisplayName(),
-                updated.getBio()
-        );
+                updated.getBio());
 
         return ResponseEntity.ok(responseDTO);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteMyAccount(HttpServletRequest request) {
+        Long userId = jwtUtil.getUserIdFromRequest(request);
+        userService.deleteById(userId);
+        return ResponseEntity.ok("Cuenta eliminada");
     }
 }

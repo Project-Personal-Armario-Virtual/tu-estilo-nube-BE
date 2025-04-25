@@ -57,4 +57,9 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
     }
+
+    public void deleteById(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
 }
