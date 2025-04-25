@@ -6,9 +6,11 @@ import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -25,25 +27,34 @@ public class ProfileController {
     }
 
     @GetMapping("/me")
-public ResponseEntity<ProfileResponseDTO> getProfile(Authentication authentication) {
-    User user = userService.findByUsername(authentication.getName());
-    Profile profile = profileService.findByUser(user);
+    public ResponseEntity<ProfileResponseDTO> getProfile(Authentication authentication) {
+        User user = userService.findByUsername(authentication.getName());
+        Profile profile = profileService.findByUser(user);
 
-    ProfileResponseDTO response = new ProfileResponseDTO(
-        profile.getId(),
-        profile.getDisplayName(),
-        profile.getBio()
-    );
+        if (profile == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil no encontrado para el usuario.");
+        }
 
-    return ResponseEntity.ok(response);
-}
+        ProfileResponseDTO response = new ProfileResponseDTO(
+                profile.getId(),
+                profile.getDisplayName(),
+                profile.getBio());
+
+        return ResponseEntity.ok(response);
+    }
 
     @PutMapping("/me")
-    public ResponseEntity<?> updateMyProfile(
+    public ResponseEntity<ProfileResponseDTO> updateMyProfile(
             HttpServletRequest request,
             @RequestBody ProfileUpdateDTO updateDTO) {
+
         Long userId = jwtUtil.getUserIdFromRequest(request);
         User user = userService.findById(userId);
+        Profile profile = profileService.findByUser(user);
+
+        if (profile == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Perfil no encontrado. ¿Ya fue creado?");
+        }
 
         Profile updated = profileService.updateProfile(user, updateDTO.getDisplayName(), updateDTO.getBio());
 
@@ -53,5 +64,12 @@ public ResponseEntity<ProfileResponseDTO> getProfile(Authentication authenticati
                 updated.getBio());
 
         return ResponseEntity.ok(responseDTO);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteMyAccount(HttpServletRequest request) {
+        Long userId = jwtUtil.getUserIdFromRequest(request);
+        userService.deleteById(userId);
+        return ResponseEntity.ok("Cuenta eliminada");
     }
 }

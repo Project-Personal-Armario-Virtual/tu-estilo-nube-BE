@@ -1,11 +1,13 @@
 package dev.yeferson.tu_estilo_nube_BE.auth;
 
+import dev.yeferson.tu_estilo_nube_BE.auth.dto.ChangePasswordRequestDTO;
 import dev.yeferson.tu_estilo_nube_BE.auth.dto.LoginResponseDTO;
 import dev.yeferson.tu_estilo_nube_BE.auth.dto.RegisterRequestDTO;
 import dev.yeferson.tu_estilo_nube_BE.security.JwtUtil;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import dev.yeferson.tu_estilo_nube_BE.user.dto.UserResponseDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import dev.yeferson.tu_estilo_nube_BE.role.Role;
 import dev.yeferson.tu_estilo_nube_BE.role.RoleRepository;
 import dev.yeferson.tu_estilo_nube_BE.profile.Profile;
@@ -80,5 +82,17 @@ public class AuthController {
         profileRepository.save(profile);
 
         return ResponseEntity.ok("User registered successfully");
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request,
+            HttpServletRequest httpRequest) {
+        Long userId = jwtUtil.getUserIdFromRequest(httpRequest);
+        try {
+            userService.changePassword(userId, request.getCurrentPassword(), request.getNewPassword());
+            return ResponseEntity.ok("Password updated successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
