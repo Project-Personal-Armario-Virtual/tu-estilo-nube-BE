@@ -20,8 +20,8 @@ public class Image {
     private String fileName;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "bytea")
-    @Basic(fetch = FetchType.EAGER)
+    @Basic(fetch = FetchType.LAZY)
+    @Column(nullable = false)
     private byte[] data;
 
     @ManyToOne
