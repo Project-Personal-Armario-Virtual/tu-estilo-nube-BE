@@ -4,6 +4,7 @@ import dev.yeferson.tu_estilo_nube_BE.image.Image;
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Outfit {
@@ -32,6 +33,18 @@ public class Outfit {
     private double score;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @ManyToMany
+    @JoinTable(name = "outfit_images", joinColumns = @JoinColumn(name = "outfit_id"), inverseJoinColumns = @JoinColumn(name = "image_id"))
+    private List<Image> images;
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
 
     public Long getId() {
         return id;
@@ -112,7 +125,5 @@ public class Outfit {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-
-    
 
 }

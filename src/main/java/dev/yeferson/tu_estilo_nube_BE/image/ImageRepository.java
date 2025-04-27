@@ -19,6 +19,7 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
     List<Image> findByUserIdAndCategory_NameIgnoreCase(Long userId, String categoryName);
     List<Image> findByUserId(Long userId);
     Optional<Image> findByIdAndUser(Long id, User user);
+  
 
   
     @Query("SELECT new dev.yeferson.tu_estilo_nube_BE.category.CategoryCountDTO(" +
