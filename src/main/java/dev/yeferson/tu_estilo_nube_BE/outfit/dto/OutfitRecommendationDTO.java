@@ -1,6 +1,9 @@
 package dev.yeferson.tu_estilo_nube_BE.outfit.dto;
 
+import org.checkerframework.checker.units.qual.t;
+
 public class OutfitRecommendationDTO {
+    private Long id;
     private ClothingItemDTO top;
     private ClothingItemDTO bottom;
     private ClothingItemDTO shoes;
@@ -9,7 +12,8 @@ public class OutfitRecommendationDTO {
     private String season;
     private double score;
 
-    public OutfitRecommendationDTO(ClothingItemDTO top, ClothingItemDTO bottom, ClothingItemDTO shoes, ClothingItemDTO accessory, String occasion, String season, double score) {
+    public OutfitRecommendationDTO(Long id, ClothingItemDTO top, ClothingItemDTO bottom, ClothingItemDTO shoes, ClothingItemDTO accessory, String occasion, String season, double score) {
+        this.id = id;
         this.top = top;
         this.bottom = bottom;
         this.shoes = shoes;
@@ -19,6 +23,7 @@ public class OutfitRecommendationDTO {
         this.score = score;
     }
 
+    public Long getId() { return id; }
     public ClothingItemDTO getTop() { return top; }
     public ClothingItemDTO getBottom() { return bottom; }
     public ClothingItemDTO getShoes() { return shoes; }

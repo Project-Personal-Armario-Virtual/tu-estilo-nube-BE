@@ -1,6 +1,10 @@
 package dev.yeferson.tu_estilo_nube_BE.favorite;
 
 import dev.yeferson.tu_estilo_nube_BE.profile.Profile;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import dev.yeferson.tu_estilo_nube_BE.outfit.Outfit;
 import jakarta.persistence.*;
 
@@ -15,6 +19,7 @@ public class FavoriteOutfit {
     private Profile profile;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Outfit outfit;
 
 

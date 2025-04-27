@@ -1,8 +1,8 @@
 package dev.yeferson.tu_estilo_nube_BE.outfit;
 
-
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,4 +30,9 @@ public class OutfitService {
         return outfitRepository.findById(outfitId)
                 .orElseThrow(() -> new RuntimeException("Outfit not found with ID: " + outfitId));
     }
+
+    public List<Outfit> getOutfitsByUserId(Long userId) {
+        return outfitRepository.findByUser_Id(userId);
+    }
+
 }

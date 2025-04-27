@@ -42,21 +42,23 @@ public class OutfitRecommendationService {
         for (ClothingItemDTO top : tops) {
             for (ClothingItemDTO bottom : bottoms) {
                 for (ClothingItemDTO shoe : shoes) {
-                    ClothingItemDTO accessory = accessories.isEmpty() ? null :
-                            accessories.get(new Random().nextInt(accessories.size()));
+                    ClothingItemDTO accessory = accessories.isEmpty() ? null
+                            : accessories.get(new Random().nextInt(accessories.size()));
 
-                    String key = top.getId() + "-" + bottom.getId() + "-" + shoe.getId() + "-" + (accessory != null ? accessory.getId() : "none");
+                    String key = top.getId() + "-" + bottom.getId() + "-" + shoe.getId() + "-"
+                            + (accessory != null ? accessory.getId() : "none");
 
                     if (!generatedKeys.contains(key)) {
                         generatedKeys.add(key);
-                        double score = scoringService.calculateScore(top, bottom, shoe, accessory, request.getSeason(), request.getOccasion());
+                        double score = scoringService.calculateScore(top, bottom, shoe, accessory, request.getSeason(),
+                                request.getOccasion());
 
                         recommendations.add(new OutfitRecommendationDTO(
+                                null, 
                                 top, bottom, shoe, accessory,
                                 request.getOccasion(),
                                 request.getSeason(),
-                                score
-                        ));
+                                score));
                     }
                 }
             }
