@@ -67,23 +67,38 @@ public class OutfitController {
     }
 
     @GetMapping("/mine")
-public ResponseEntity<List<OutfitRecommendationDTO>> getMyOutfits(HttpServletRequest request) {
-    Long userId = jwtUtil.getUserIdFromRequest(request);
-    List<Outfit> outfits = outfitService.getOutfitsByUserId(userId);
+    public ResponseEntity<List<OutfitRecommendationDTO>> getMyOutfits(HttpServletRequest request) {
+        Long userId = jwtUtil.getUserIdFromRequest(request);
+        List<Outfit> outfits = outfitService.getOutfitsByUserId(userId);
 
-    List<OutfitRecommendationDTO> outfitDTOs = outfits.stream().map(outfit -> {
-        return new OutfitRecommendationDTO(
-            outfit.getTop() != null ? new ClothingItemDTO(outfit.getTop()) : null,
-            outfit.getBottom() != null ? new ClothingItemDTO(outfit.getBottom()) : null,
-            outfit.getShoes() != null ? new ClothingItemDTO(outfit.getShoes()) : null,
-            outfit.getAccessory() != null ? new ClothingItemDTO(outfit.getAccessory()) : null,
-            outfit.getOccasion(),
-            outfit.getSeason(),
-            outfit.getScore()
-        );
-    }).toList();
+        List<OutfitRecommendationDTO> outfitDTOs = outfits.stream().map(outfit -> {
+            return new OutfitRecommendationDTO(
+                    outfit.getTop() != null ? new ClothingItemDTO(outfit.getTop()) : null,
+                    outfit.getBottom() != null ? new ClothingItemDTO(outfit.getBottom()) : null,
+                    outfit.getShoes() != null ? new ClothingItemDTO(outfit.getShoes()) : null,
+                    outfit.getAccessory() != null ? new ClothingItemDTO(outfit.getAccessory()) : null,
+                    outfit.getOccasion(),
+                    outfit.getSeason(),
+                    outfit.getScore());
+        }).toList();
 
-    return ResponseEntity.ok(outfitDTOs);
-}
+        return ResponseEntity.ok(outfitDTOs);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOutfit(
+            HttpServletRequest request,
+            @PathVariable Long id) {
+
+        Long userId = jwtUtil.getUserIdFromRequest(request);
+        Outfit outfit = outfitService.getById(id);
+
+        if (!outfit.getUser().getId().equals(userId)) {
+            return ResponseEntity.status(403).build(); 
+        }
+
+        outfitService.deleteOutfit(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }
