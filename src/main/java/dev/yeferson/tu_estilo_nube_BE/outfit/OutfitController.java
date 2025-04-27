@@ -73,6 +73,7 @@ public class OutfitController {
 
         List<OutfitRecommendationDTO> outfitDTOs = outfits.stream().map(outfit -> {
             return new OutfitRecommendationDTO(
+                    outfit.getId(), 
                     outfit.getTop() != null ? new ClothingItemDTO(outfit.getTop()) : null,
                     outfit.getBottom() != null ? new ClothingItemDTO(outfit.getBottom()) : null,
                     outfit.getShoes() != null ? new ClothingItemDTO(outfit.getShoes()) : null,
@@ -86,19 +87,15 @@ public class OutfitController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOutfit(
-            HttpServletRequest request,
-            @PathVariable Long id) {
-
+    public ResponseEntity<Void> deleteOutfit(HttpServletRequest request, @PathVariable Long id) {
         Long userId = jwtUtil.getUserIdFromRequest(request);
         Outfit outfit = outfitService.getById(id);
 
         if (!outfit.getUser().getId().equals(userId)) {
-            return ResponseEntity.status(403).build(); 
+            return ResponseEntity.status(403).build();
         }
 
         outfitService.deleteOutfit(id);
         return ResponseEntity.noContent().build();
     }
-
 }
