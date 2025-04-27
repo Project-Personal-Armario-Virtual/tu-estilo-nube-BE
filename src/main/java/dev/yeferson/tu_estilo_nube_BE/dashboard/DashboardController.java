@@ -36,7 +36,6 @@ public class DashboardController {
         return ResponseEntity.ok(stats);
     }
 
- 
     @GetMapping("/categories")
     public ResponseEntity<List<CategorySummaryDTO>> getCategorySummary(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

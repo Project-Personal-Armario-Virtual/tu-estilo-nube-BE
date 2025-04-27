@@ -23,7 +23,8 @@ public class ImageController {
     private final VisionService visionService;
     private final CategoryService categoryService;
 
-    public ImageController(ImageService imageService, UserService userService, VisionService visionService, CategoryService categoryService) {
+    public ImageController(ImageService imageService, UserService userService, VisionService visionService,
+            CategoryService categoryService) {
         this.imageService = imageService;
         this.userService = userService;
         this.visionService = visionService;
@@ -51,13 +52,12 @@ public class ImageController {
 
             byte[] imageData = file.getBytes();
 
-           
             VisionService.ProcessedImageData processedData = visionService.analyzeImage(imageData);
             List<String> labels = processedData.getLabels();
             String dominantColor = processedData.getDominantColor();
 
             Category category = null;
-            
+
             if (categoryId == null) {
                 CategoryMappingService mappingService = new CategoryMappingService();
                 String suggestedCategoryName = mappingService.suggestCategory(processedData);
@@ -76,10 +76,9 @@ public class ImageController {
                 }
             }
 
-            // Guardar la imagen con la información extraída y la categoría determinada
             imageService.saveImage(file.getOriginalFilename(), imageData, user, labels, category, dominantColor);
-            String responseMessage = "Image uploaded and analyzed successfully. Suggested category: " 
-                                     + (category != null ? category.getName() : "None");
+            String responseMessage = "Image uploaded and analyzed successfully. Suggested category: "
+                    + (category != null ? category.getName() : "None");
             return ResponseEntity.ok(responseMessage);
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,30 +120,32 @@ public class ImageController {
     }
 
     @GetMapping("/{id}/preview")
-public ResponseEntity<byte[]> previewImage(@PathVariable Long id, Authentication authentication) {
-    if (authentication == null || !authentication.isAuthenticated()) {
-        return ResponseEntity.status(401).build();
+    public ResponseEntity<byte[]> previewImage(@PathVariable Long id, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        return imageService.findByIdAndUser(id, user)
+                .map(img -> {
+                    String contentType = "image/jpeg";
+                    String filename = img.getFileName() != null ? img.getFileName().toLowerCase() : "";
+                    if (filename.endsWith(".png"))
+                        contentType = "image/png";
+                    if (filename.endsWith(".webp"))
+                        contentType = "image/webp";
+
+                    return ResponseEntity.ok()
+                            .header("Content-Type", contentType)
+                            .body(img.getData());
+                })
+                .orElseGet(() -> ResponseEntity.status(404).build());
     }
-
-    String username = authentication.getName();
-    User user = userService.findByUsername(username);
-    if (user == null) {
-        return ResponseEntity.status(404).build();
-    }
-
-    return imageService.findByIdAndUser(id, user)
-            .map(img -> {
-                String contentType = "image/jpeg";
-                String filename = img.getFileName() != null ? img.getFileName().toLowerCase() : "";
-                if (filename.endsWith(".png")) contentType = "image/png";
-                if (filename.endsWith(".webp")) contentType = "image/webp";
-
-                return ResponseEntity.ok()
-                        .header("Content-Type", contentType)
-                        .body(img.getData());
-            })
-            .orElseGet(() -> ResponseEntity.status(404).build());
-}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteImage(@PathVariable Long id, Authentication authentication) {
@@ -159,6 +160,12 @@ public ResponseEntity<byte[]> previewImage(@PathVariable Long id, Authentication
         try {
             imageService.deleteImage(id, user);
             return ResponseEntity.ok("Image deleted successfully");
+        } catch (ImageInUseException e) {
+            // 👈 Este debe estar primero, antes que Exception general
+            return ResponseEntity.status(409).body(e.getMessage());
+        } catch (RuntimeException e) {
+            // 👈 Si quieres capturar Runtime también aparte
+            return ResponseEntity.status(400).body("Bad Request: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error deleting image: " + e.getMessage());
@@ -166,26 +173,25 @@ public ResponseEntity<byte[]> previewImage(@PathVariable Long id, Authentication
     }
 
     @GetMapping("/recent")
-public ResponseEntity<List<ImageDTO>> getRecentImages(Authentication authentication) {
-    if (authentication == null || !authentication.isAuthenticated()) {
-        return ResponseEntity.status(401).build();
+    public ResponseEntity<List<ImageDTO>> getRecentImages(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        List<Image> recentImages = imageService.findRecentImagesByUser(user);
+        List<ImageDTO> imageDTOs = recentImages.stream().map(i -> {
+            String categoryName = (i.getCategory() != null) ? i.getCategory().getName() : null;
+            return new ImageDTO(i.getId(), i.getFileName(), i.getUser().getId(), i.getLabels(), categoryName,
+                    i.getDominantColor());
+        }).toList();
+
+        return ResponseEntity.ok(imageDTOs);
     }
 
-    String username = authentication.getName();
-    User user = userService.findByUsername(username);
-    if (user == null) {
-        return ResponseEntity.status(404).build();
-    }
-
-    List<Image> recentImages = imageService.findRecentImagesByUser(user);
-    List<ImageDTO> imageDTOs = recentImages.stream().map(i -> {
-        String categoryName = (i.getCategory() != null) ? i.getCategory().getName() : null;
-        return new ImageDTO(i.getId(), i.getFileName(), i.getUser().getId(), i.getLabels(), categoryName, i.getDominantColor());
-    }).toList();
-
-    return ResponseEntity.ok(imageDTOs);
-}
-
-
-    
 }

@@ -4,11 +4,13 @@ public class DashboardStatsDTO {
     private int totalItems;
     private int totalCategories;
     private String mostCommonColor;
+    private int totalOutfits; // 👈 agregado
 
-    public DashboardStatsDTO(int totalItems, int totalCategories, String mostCommonColor) {
+    public DashboardStatsDTO(int totalItems, int totalCategories, String mostCommonColor, int totalOutfits) {
         this.totalItems = totalItems;
         this.totalCategories = totalCategories;
         this.mostCommonColor = mostCommonColor;
+        this.totalOutfits = totalOutfits;
     }
 
     public int getTotalItems() {
@@ -35,4 +37,11 @@ public class DashboardStatsDTO {
         this.mostCommonColor = mostCommonColor;
     }
 
+    public int getTotalOutfits() {
+        return totalOutfits;
+    }
+
+    public void setTotalOutfits(int totalOutfits) {
+        this.totalOutfits = totalOutfits;
+    }
 }
