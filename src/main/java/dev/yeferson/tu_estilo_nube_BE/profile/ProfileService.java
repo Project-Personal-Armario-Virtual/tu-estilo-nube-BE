@@ -1,11 +1,7 @@
 package dev.yeferson.tu_estilo_nube_BE.profile;
 
 import dev.yeferson.tu_estilo_nube_BE.user.User;
-import dev.yeferson.tu_estilo_nube_BE.profile.Profile;
-import dev.yeferson.tu_estilo_nube_BE.profile.ProfileRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class ProfileService {
@@ -29,10 +25,10 @@ public class ProfileService {
     public Profile updateProfile(User user, String displayName, String bio) {
         Profile profile = profileRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
-    
+
         profile.setDisplayName(displayName);
         profile.setBio(bio);
-    
+
         return profileRepository.save(profile);
     }
 

@@ -42,8 +42,7 @@ public class DashboardService {
                 .map(Map.Entry::getKey)
                 .orElse("N/A");
 
-        int totalOutfits = outfitRepository.findByUser(user).size(); // 👈 nuevo
-
+        int totalOutfits = outfitRepository.findByUser(user).size(); 
         return new DashboardStatsDTO(totalItems, totalCategories, mostCommonColor, totalOutfits);
     }
 
