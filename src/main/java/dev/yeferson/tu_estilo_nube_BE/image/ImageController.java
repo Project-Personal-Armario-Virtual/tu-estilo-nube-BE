@@ -161,10 +161,10 @@ public class ImageController {
             imageService.deleteImage(id, user);
             return ResponseEntity.ok("Image deleted successfully");
         } catch (ImageInUseException e) {
-            // 👈 Este debe estar primero, antes que Exception general
+          
             return ResponseEntity.status(409).body(e.getMessage());
         } catch (RuntimeException e) {
-            // 👈 Si quieres capturar Runtime también aparte
+         
             return ResponseEntity.status(400).body("Bad Request: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();

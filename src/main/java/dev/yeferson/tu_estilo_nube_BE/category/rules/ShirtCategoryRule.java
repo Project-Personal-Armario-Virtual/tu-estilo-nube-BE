@@ -22,7 +22,7 @@ public class ShirtCategoryRule implements CategoryRule {
         List<String> lowerLabels = data.getLabels().stream()
                                        .map(String::toLowerCase)
                                        .collect(Collectors.toList());
-        // Si se detectan términos de underwear, devolvemos null para que la regla UnderwearCategoryRule se encargue
+        
         if (lowerLabels.contains("bra") || lowerLabels.contains("lingerie") ||
             lowerLabels.contains("undergarment") || lowerLabels.contains("sports bra")) {
             return null;

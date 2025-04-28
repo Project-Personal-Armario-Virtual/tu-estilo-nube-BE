@@ -47,10 +47,10 @@ public class VisionService {
                     continue;
                 }
 
-                // Extraer etiquetas
+              
                 res.getLabelAnnotationsList().forEach(annotation -> labels.add(annotation.getDescription()));
 
-                // Extraer colores dominantes
+   
                 ImageProperties properties = res.getImagePropertiesAnnotation();
                 if (properties != null && properties.getDominantColors() != null) {
                     List<ColorInfo> colors = properties.getDominantColors().getColorsList();

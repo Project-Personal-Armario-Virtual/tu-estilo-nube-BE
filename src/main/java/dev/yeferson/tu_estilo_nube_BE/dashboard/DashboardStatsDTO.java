@@ -4,7 +4,7 @@ public class DashboardStatsDTO {
     private int totalItems;
     private int totalCategories;
     private String mostCommonColor;
-    private int totalOutfits; // 👈 agregado
+    private int totalOutfits; 
 
     public DashboardStatsDTO(int totalItems, int totalCategories, String mostCommonColor, int totalOutfits) {
         this.totalItems = totalItems;

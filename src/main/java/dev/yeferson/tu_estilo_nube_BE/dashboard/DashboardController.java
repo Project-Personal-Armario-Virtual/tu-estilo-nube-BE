@@ -1,6 +1,6 @@
 package dev.yeferson.tu_estilo_nube_BE.dashboard;
 
-import dev.yeferson.tu_estilo_nube_BE.category.CategoryCountDTO;
+
 import dev.yeferson.tu_estilo_nube_BE.user.User;
 import dev.yeferson.tu_estilo_nube_BE.user.UserService;
 import org.springframework.http.ResponseEntity;
