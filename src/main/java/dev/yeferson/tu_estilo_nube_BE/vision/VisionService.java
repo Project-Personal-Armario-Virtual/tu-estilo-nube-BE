@@ -1,14 +1,6 @@
 package dev.yeferson.tu_estilo_nube_BE.vision;
 
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
-import com.google.cloud.vision.v1.ColorInfo;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.Feature.Type;
-import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.ImageProperties;
+import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
 import com.google.type.Color;
 import org.springframework.stereotype.Service;
@@ -25,8 +17,8 @@ public class VisionService {
             ByteString imgBytes = ByteString.copyFrom(imageData);
             Image img = Image.newBuilder().setContent(imgBytes).build();
 
-            Feature labelFeature = Feature.newBuilder().setType(Type.LABEL_DETECTION).build();
-            Feature propertiesFeature = Feature.newBuilder().setType(Type.IMAGE_PROPERTIES).build();
+            Feature labelFeature = Feature.newBuilder().setType(Feature.Type.LABEL_DETECTION).build();
+            Feature propertiesFeature = Feature.newBuilder().setType(Feature.Type.IMAGE_PROPERTIES).build();
 
             AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
                     .addFeatures(labelFeature)
@@ -39,7 +31,7 @@ public class VisionService {
 
             List<String> labels = new ArrayList<>();
             String dominantColor = null;
-            float maxFraction = 0.0f;
+            float maxFraction = -1f;
 
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
@@ -47,13 +39,11 @@ public class VisionService {
                     continue;
                 }
 
-              
                 res.getLabelAnnotationsList().forEach(annotation -> labels.add(annotation.getDescription()));
 
-   
-                ImageProperties properties = res.getImagePropertiesAnnotation();
-                if (properties != null && properties.getDominantColors() != null) {
-                    List<ColorInfo> colors = properties.getDominantColors().getColorsList();
+                ImageProperties props = res.getImagePropertiesAnnotation();
+                if (props != null && props.getDominantColors() != null) {
+                    List<ColorInfo> colors = props.getDominantColors().getColorsList();
                     System.out.println("Detected Colors:");
                     for (ColorInfo colorInfo : colors) {
                         Color c = colorInfo.getColor();
@@ -61,15 +51,14 @@ public class VisionService {
                         float g = c.getGreen();
                         float b = c.getBlue();
                         float pixelFraction = colorInfo.getPixelFraction();
-                        System.out.printf("RGB(%.2f, %.2f, %.2f), Fraction: %.2f%n", r, g, b, pixelFraction);
-
-                        if (r > 220 && g > 220 && b > 220) {
-                            System.out.println("Ignoring nearly white color");
-                            continue;
-                        }
 
                         String currentColor = ColorNameMapper.mapRgbToColorName(c);
-                        if (pixelFraction > maxFraction) {
+
+                        System.out.printf("RGB(%.2f, %.2f, %.2f) Fraction: %.2f → %s%n", r, g, b, pixelFraction, currentColor);
+
+                        boolean isWhiteLike = r > 240 && g > 240 && b > 240;
+
+                        if (pixelFraction > maxFraction && !isWhiteLike && !"Unknown".equals(currentColor)) {
                             maxFraction = pixelFraction;
                             dominantColor = currentColor;
                         }
@@ -78,8 +67,8 @@ public class VisionService {
                     if (dominantColor == null && !colors.isEmpty()) {
                         Color firstColor = colors.get(0).getColor();
                         dominantColor = ColorNameMapper.mapRgbToColorName(firstColor);
-                        maxFraction = colors.get(0).getPixelFraction();
                     }
+
                     System.out.println("Dominant Color Selected: " + dominantColor + " (Fraction: " + maxFraction + ")");
                 }
             }
